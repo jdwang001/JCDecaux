@@ -66,7 +66,7 @@ public class two {
                 Date sdate = localTime.parse(star);
                 Date edate=localTime.parse(end);
                 Date date = localTime.parse(toLocalTime(datatime));
-                System.out.println(sdate.getTime()+"##"+date.getTime()+"##"+edate.getTime());
+//                System.out.println(sdate.getTime()+"##"+date.getTime()+"##"+edate.getTime());
                 if (date.after(sdate) && date.before(edate)) {
 //                    System.out.println("true");
                     return true;

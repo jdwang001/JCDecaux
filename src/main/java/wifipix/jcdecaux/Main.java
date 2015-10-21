@@ -6,6 +6,7 @@ import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
@@ -13,8 +14,6 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.jobcontrol.ControlledJob;
 import org.apache.hadoop.mapreduce.lib.jobcontrol.JobControl;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import wifipix.jcdecaux.cleandata.CleanData;
-import wifipix.jcdecaux.processone.ProcessOne;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -36,43 +35,62 @@ public class Main {
 
     public static void runJob(Configuration conf) {
         try {
-            Job cleanDataJob = createClenaDataJob(conf);
-            Job processDataOneJob = createProcessDataOne(conf);
-            Job processDataTwoJob = createProcessDataTwo(conf);
-            Job processDataThreeJob = createProcessDataThree(conf);
-            Job grepMacOneJob = createGrepMacOne(conf);
-            Job grepMacTwoJob = createGrepMacTwo(conf);
+//            Job cleanDataJob = createClenaDataJob(conf);
+//            Job processDataOneJob = createProcessDataOne(conf);
+//            Job processDataTwoJob = createProcessDataTwo(conf);
+//            Job processDataThreeJob = createProcessDataThree(conf);
+//            Job grepMacOneJob = createGrepMacOne(conf);
+//            Job grepMacTwoJob = createGrepMacTwo(conf);
+//            Job createAnalyseJob = createAnalyse(conf);
+            Job createAnalyseAnswerJob = createAnalyseAnswer(conf);
 
 
-            ControlledJob cleanDataCj = new ControlledJob(conf);
-            cleanDataCj.setJob(cleanDataJob);
-            ControlledJob processDataOneCj = new ControlledJob(conf);
-            processDataOneCj.setJob(processDataOneJob);
-            ControlledJob processDataTwoCj = new ControlledJob(conf);
-            processDataTwoCj.setJob(processDataTwoJob);
-            ControlledJob processDataThreeCj = new ControlledJob(conf);
-            processDataThreeCj.setJob(processDataThreeJob);
 
-            ControlledJob grepMacOneJobCj = new ControlledJob(conf);
-            grepMacOneJobCj.setJob(grepMacOneJob);
 
-            ControlledJob grepMacTwoJobCj = new ControlledJob(conf);
-            grepMacTwoJobCj.setJob(grepMacTwoJob);
+//            ControlledJob cleanDataCj = new ControlledJob(conf);
+//            cleanDataCj.setJob(cleanDataJob);
+//            ControlledJob processDataOneCj = new ControlledJob(conf);
+//            processDataOneCj.setJob(processDataOneJob);
+//            ControlledJob processDataTwoCj = new ControlledJob(conf);
+//            processDataTwoCj.setJob(processDataTwoJob);
+//            ControlledJob processDataThreeCj = new ControlledJob(conf);
+//            processDataThreeCj.setJob(processDataThreeJob);
+//
+//            ControlledJob grepMacOneJobCj = new ControlledJob(conf);
+//            grepMacOneJobCj.setJob(grepMacOneJob);
+//
+//            ControlledJob grepMacTwoJobCj = new ControlledJob(conf);
+//            grepMacTwoJobCj.setJob(grepMacTwoJob);
+
+            //创建分析任务
+//            ControlledJob createAnalyseJobCj = new ControlledJob(conf);
+//            createAnalyseJobCj.setJob(createAnalyseJob);
+//
+//            //todo：比较所有数据而后进行计数
+            ControlledJob createAnalyseAnswerJobCj = new ControlledJob(conf);
+            createAnalyseAnswerJobCj.setJob(createAnalyseAnswerJob);
+
+
+
 
             // 设置串行子任务
-            processDataOneCj.addDependingJob(cleanDataCj);
-            processDataTwoCj.addDependingJob(cleanDataCj);
-            processDataThreeCj.addDependingJob(cleanDataCj);
-            grepMacOneJobCj.addDependingJob(cleanDataCj);
-            grepMacTwoJobCj.addDependingJob(cleanDataCj);
+//            processDataOneCj.addDependingJob(cleanDataCj);
+//            processDataTwoCj.addDependingJob(cleanDataCj);
+//            processDataThreeCj.addDependingJob(cleanDataCj);
+//            grepMacOneJobCj.addDependingJob(cleanDataCj);
+//            grepMacTwoJobCj.addDependingJob(cleanDataCj);
+//            createAnalyseJobCj.addDependingJob(cleanDataCj);
+//            createAnalyseAnswerJobCj.addDependingJob(createAnalyseJobCj);
 
             JobControl jobControl = new JobControl("JCDecaux");
-            jobControl.addJob(cleanDataCj);
-            jobControl.addJob(processDataOneCj);
-            jobControl.addJob(processDataTwoCj);
-            jobControl.addJob(processDataThreeCj);
-            jobControl.addJob(grepMacOneJobCj);
-            jobControl.addJob(grepMacTwoJobCj);
+//            jobControl.addJob(cleanDataCj);
+//            jobControl.addJob(processDataOneCj);
+//            jobControl.addJob(processDataTwoCj);
+//            jobControl.addJob(processDataThreeCj);
+//            jobControl.addJob(grepMacOneJobCj);
+//            jobControl.addJob(grepMacTwoJobCj);
+//            jobControl.addJob(createAnalyseJobCj);
+            jobControl.addJob(createAnalyseAnswerJobCj);
 
             int jobLength = jobControl.getWaitingJobList().size();
             Thread t = new Thread(jobControl);
@@ -101,6 +119,27 @@ public class Main {
     public static Job createClenaDataJob(Configuration conf) throws Exception {
 //        String input = "/jcdecaux/realdata";
         String input = "/wifipix/retail/daily/raw/2015/09/20150918";
+//        String inputalldata = "/wifipix/retail/daily/raw/2015/09/20150918," +
+//                "/wifipix/retail/daily/raw/2015/09/20150919," +
+//                "/wifipix/retail/daily/raw/2015/09/20150920," +
+//                "/wifipix/retail/daily/raw/2015/09/20150921," +
+//                "/wifipix/retail/daily/raw/2015/09/20150922," +
+//                "/wifipix/retail/daily/raw/2015/09/20150923," +
+//                "/wifipix/retail/daily/raw/2015/09/20150924," +
+//                "/wifipix/retail/daily/raw/2015/09/20150925," +
+//                "/wifipix/retail/daily/raw/2015/09/20150926," +
+//                "/wifipix/retail/daily/raw/2015/09/20150927," +
+//                "/wifipix/retail/daily/raw/2015/09/20150928," +
+//                "/wifipix/retail/daily/raw/2015/09/20150929," +
+//                "/wifipix/retail/daily/raw/2015/09/20150930," +
+//                "/wifipix/retail/daily/raw/2015/10/20151001," +
+//                "/wifipix/retail/daily/raw/2015/10/20151002," +
+//                "/wifipix/retail/daily/raw/2015/10/20151003," +
+//                "/wifipix/retail/daily/raw/2015/10/20151004," +
+//                "/wifipix/retail/daily/raw/2015/10/20151005," +
+//                "/wifipix/retail/daily/raw/2015/10/20151006," +
+//                "/wifipix/retail/daily/raw/2015/10/20151007";
+
         String formatOut = "/jcdecaux/formatdata";
         String filter = "/jcdecaux/filter";
         Path inputPath = new Path(input);
@@ -126,7 +165,9 @@ public class Main {
         }
 
         FileInputFormat.addInputPath(job, inputPath);
+//        FileInputFormat.addInputPaths(job, inputalldata);
         FileOutputFormat.setOutputPath(job, formatOutPath);
+//        FileOutputFormat.setOutputPath(job, new Path("/jcdecaux/2overformat"));
 
         return job;
     }
@@ -249,6 +290,58 @@ public class Main {
         job.setMapperClass(wifipix.jcdecaux.grepmac.two.getSimple2Mapper.class);
         job.setCombinerClass(wifipix.jcdecaux.grepmac.two.getSimple2Reducer.class);
         job.setReducerClass(wifipix.jcdecaux.grepmac.two.getSimple2Reducer.class);
+
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(Text.class);
+
+        FileInputFormat.addInputPath(job, inputPath);
+        FileOutputFormat.setOutputPath(job, outputPath);
+
+        return job;
+    }
+
+    public static Job createAnalyse(Configuration configuration) throws Exception {
+        String input = "/jcdecaux/formatdata";
+        String output = "/jcdecaux/analyseformat";
+
+        Path inputPath = new Path(input);
+        Path outputPath = new Path(output);
+
+        boolean deleteOutputPath = outputPath.getFileSystem(configuration).delete(outputPath, true);
+        System.out.println("Delete grepmactwo OutputPath is " + deleteOutputPath);
+
+        Job job = Job.getInstance(configuration, "Job Analyse");
+        job.setJarByClass(Main.class);
+        job.setMapperClass(wifipix.jcdecaux.analyse.Analyse.analyseMapper.class);
+//        job.setCombinerClass(wifipix.jcdecaux.analyse.Analyse.analyeReducer.class);
+        job.setReducerClass(wifipix.jcdecaux.analyse.Analyse.analyeReducer.class);
+
+        job.setMapOutputKeyClass(Text.class);
+        job.setMapOutputValueClass(LongWritable.class);
+        job.setOutputKeyClass(NullWritable.class);
+        job.setOutputValueClass(Text.class);
+
+        FileInputFormat.addInputPath(job, inputPath);
+        FileOutputFormat.setOutputPath(job, outputPath);
+
+        return job;
+    }
+
+    public static Job createAnalyseAnswer(Configuration configuration) throws Exception {
+        String input = "/jcdecaux/analyseformat";
+        String output = "/jcdecaux/analyseanswer";
+
+        Path inputPath = new Path(input);
+        Path outputPath = new Path(output);
+
+        boolean deleteOutputPath = outputPath.getFileSystem(configuration).delete(outputPath, true);
+        System.out.println("Delete analyseanswer OutputPath is " + deleteOutputPath);
+
+        Job job = Job.getInstance(configuration, "Job AnalyseAnswer");
+        job.setJarByClass(Main.class);
+        job.setMapperClass(wifipix.jcdecaux.analyse.AnalyseAnswer.AnalyseAnswerMapper.class);
+        job.setCombinerClass(wifipix.jcdecaux.analyse.AnalyseAnswer.AnalyseAnswerReducer.class);
+        job.setReducerClass(wifipix.jcdecaux.analyse.AnalyseAnswer.AnalyseAnswerReducer.class);
 
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);

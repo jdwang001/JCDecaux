@@ -80,7 +80,7 @@ public class CleanData {
                 Date sdate = localTime.parse(star);
                 Date edate=localTime.parse(end);
                 Date date = localTime.parse(toLocalTime(datatime));
-                System.out.println(sdate.getTime()+"##"+date.getTime()+"##"+edate.getTime());
+//                System.out.println(sdate.getTime()+"##"+date.getTime()+"##"+edate.getTime());
                 if (date.after(sdate) && date.before(edate)) {
                     return true;
                 }
@@ -112,6 +112,7 @@ public class CleanData {
             String[] field = formatline.split(" ");
             String inAPlist,inPhoneMac;
             // 先过滤AP MAC而后再过滤是否是手机Mac,isPhoneMac format xx:xx:xx
+            // 原始数据格式可得到 AP采集到数据，及数据域不包含相关AP的最终数据
             if (isApMac.get(field[1]) != null) {
                 if (isApMac.get(field[2]) == null) {
                     if (isPhoneMac.get(field[2].substring(0, 8)) != null) {
