@@ -43,8 +43,7 @@ public class Main {
 //            Job grepMacTwoJob = createGrepMacTwo(conf);
 //            Job createAnalyseJob = createAnalyse(conf);
             Job createAnalyseAnswerJob = createAnalyseAnswer(conf);
-
-
+            Job createEndCountJob = createEndCount(conf);
 
 
 //            ControlledJob cleanDataCj = new ControlledJob(conf);
@@ -70,8 +69,8 @@ public class Main {
             ControlledJob createAnalyseAnswerJobCj = new ControlledJob(conf);
             createAnalyseAnswerJobCj.setJob(createAnalyseAnswerJob);
 
-
-
+            ControlledJob createEndCountJobCj = new ControlledJob(conf);
+            createEndCountJobCj.setJob(createEndCountJob);
 
             // 设置串行子任务
 //            processDataOneCj.addDependingJob(cleanDataCj);
@@ -81,6 +80,9 @@ public class Main {
 //            grepMacTwoJobCj.addDependingJob(cleanDataCj);
 //            createAnalyseJobCj.addDependingJob(cleanDataCj);
 //            createAnalyseAnswerJobCj.addDependingJob(createAnalyseJobCj);
+            createEndCountJobCj.addDependingJob(createAnalyseAnswerJobCj);
+
+
 
             JobControl jobControl = new JobControl("JCDecaux");
 //            jobControl.addJob(cleanDataCj);
@@ -91,6 +93,7 @@ public class Main {
 //            jobControl.addJob(grepMacTwoJobCj);
 //            jobControl.addJob(createAnalyseJobCj);
             jobControl.addJob(createAnalyseAnswerJobCj);
+            jobControl.addJob(createEndCountJobCj);
 
             int jobLength = jobControl.getWaitingJobList().size();
             Thread t = new Thread(jobControl);
@@ -343,6 +346,9 @@ public class Main {
         job.setCombinerClass(wifipix.jcdecaux.analyse.AnalyseAnswer.AnalyseAnswerReducer.class);
         job.setReducerClass(wifipix.jcdecaux.analyse.AnalyseAnswer.AnalyseAnswerReducer.class);
 
+//        job.setMapOutputKeyClass(Text.class);
+//        job.setMapOutputValueClass(Text.class);
+
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
 
@@ -350,6 +356,33 @@ public class Main {
         FileOutputFormat.setOutputPath(job, outputPath);
 
         return job;
+    }
+
+
+    public static Job createEndCount(Configuration configuration) throws Exception {
+        String input = "/jcdecaux/analyseanswer";
+        String output = "/jcdecaux/EndCount";
+
+        Path inputPath = new Path(input);
+        Path outputPath = new Path(output);
+
+        boolean deleteOutputPath = outputPath.getFileSystem(configuration).delete(outputPath, true);
+        System.out.println("Delete createEndCountOutputPath is " + deleteOutputPath);
+
+        Job job = Job.getInstance(configuration, "Job createEndCount");
+        job.setJarByClass(Main.class);
+        job.setMapperClass(wifipix.jcdecaux.analyse.Number2Ap.number2ApMapper.class);
+//        job.setCombinerClass(wifipix.jcdecaux.analyse.);
+//        job.setReducerClass(wifipix.jcdecaux.analyse.);
+
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(LongWritable.class);
+
+        FileInputFormat.addInputPath(job, inputPath);
+        FileOutputFormat.setOutputPath(job, outputPath);
+
+        return job;
+
     }
 
         private static List<String> addFile2cachFile(FileSystem fs, Path input, Job job) throws IOException {

@@ -50,10 +50,10 @@ public class AnalyseAnswer {
             Map<String, Long> etime = new HashMap<String, Long>();
 
             for (Text tmp : values) {
-                line += tmp;
+                line += (tmp + " ");
             }
+//            userDataTime.set(key.toString()+line+" ");
             userDataTime.set(line);
-
 
             context.write(key, userDataTime);
 
